@@ -1,15 +1,32 @@
 <?php
 
 namespace App\Services;
+
 use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 class CallApiService
 {
+    private string $gotenbergAppUrl;
+    public function __construct(string $gotenbergAppUrl)
+    {
+        $this->gotenbergAppUrl = $gotenbergAppUrl;
+    }
 
-    public function sendUrlToGotenberg($url) {
+    /**
+     * @throws RedirectionExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     */
+    public function sendUrlToGotenberg($url)
+    {
         $client = httpClient::create();
-        $response = $client->request('POST', 'http://gotenberg:3000/convert/url', [
-            'header' => [
+        $response = $client->request('POST', $this->gotenbergAppUrl, [
+            'headers' => [
                 'Content-Type' => 'multipart/form-data',
             ],
             'body' => [
@@ -24,5 +41,4 @@ class CallApiService
             return $response->getContent();
         }
     }
-
 }
